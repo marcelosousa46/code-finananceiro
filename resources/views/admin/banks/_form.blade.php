@@ -1,0 +1,20 @@
+@include('errors._error_field')
+<?php $errorClass = $errors->first('name')? ['class' => 'validade invalid']:[]?>
+<div class="row">
+    <div class="input-field col s6">
+         {!! Form::text('name', null, $errorClass) !!}
+         {!! Form::label('name', 'Nome') !!}
+    </div>
+    <div class="input-field file-field col s6">
+         <div class="btn">
+              <span>Logo</span>
+              {!! Form::file('logo') !!}
+         </div>
+         <div class="file-path-wrapper">
+         	<input type="text" class="file-path"/>
+         </div>
+    	
+    </div>
+</div>
+
+
