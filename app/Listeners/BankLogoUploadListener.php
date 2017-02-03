@@ -7,6 +7,7 @@ use CodeFin\Events\BankstoredEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Storage;
+use CodeFin\Repositories\BankRepository;
 
 
 class BankLogoUploadListener
@@ -28,15 +29,17 @@ class BankLogoUploadListener
      * @param  BankstoredEvent  $event
      * @return void
      */
-    public function handle(BankstoredEvent $event)
+    public function handle(BankStoredEvent $event)
     {
-        $bakn = $event->getBank();
+        $bank = $event->getBank();
         $logo = $event->getLogo();
-
-        $name = md5(time()).''.$logo->guessExtension;
-        $destFile = Bank::logosDir();
-        \Storage::disk('public')->putFileAs($destFile, $logo, $name);
-
-        $this->repository->update(['logo' => $name], $bank->id);
+        if($logo){
+            $name = $bank->created_at != $bank->updated_at ? $bank->logo : md5(time().$logo->getClientOriginalName()).'.'.$logo->guessExtension();
+            $destFile = Bank::logosDir();
+            $result = \Storage::disk('public')->putFileAs($destFile, $logo, $name);
+            if($result && $bank->created_at == $bank->updated_at){
+                $this->repository->update(['logo' => $name], $bank->id);
+            }
+        }    
     }
 }

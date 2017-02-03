@@ -1,5 +1,5 @@
 import LocalStorage from './services/localStorage';
-import appConfig from './services/AppConfig';
+import appConfig from './services/appConfig';
 
 require('materialize-css');
 window.Vue = require('vue');

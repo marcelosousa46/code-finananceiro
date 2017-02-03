@@ -3,6 +3,8 @@
 namespace CodeFin\Events;
 
 use CodeFin\Models\Bank;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\UploadedFile;
 
 
@@ -19,7 +21,7 @@ class BankStoredEvent
      *
      * @return void
      */
-    public function __construct(Bank $bank, uploadeFile $logo)
+    public function __construct(Bank $bank, UploadedFile $logo = null)
     {
         $this->bank = $bank;
         $this->logo = $logo;

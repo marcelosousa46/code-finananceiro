@@ -22,12 +22,13 @@ export default {
      	});
 	},
 	revokeToken(){
-     	let afterRevokeToken = () => {
+     	let afterRevokeToken = (response) => {
      		this.token = null;
+            return response;
      	};
      	return Jwt.logout()
-     	          .then(afterRevokeToken())
-     	          .catch(afterRevokeToken());
+     	          .then(afterRevokeToken)
+     	          .catch(afterRevokeToken);
 
 	},
      getAuthorizationHeader(){
