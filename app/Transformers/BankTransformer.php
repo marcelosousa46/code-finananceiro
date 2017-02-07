@@ -2,9 +2,9 @@
 
 namespace CodeFin\Transformers;
 
-use League\Fractal\TransformerAbstract;
 use CodeFin\Models\Bank;
-
+use Illuminate\Support\Facades\Request;
+use League\Fractal\TransformerAbstract;
 /**
  * Class BankTransformer
  * @package namespace CodeFin\Transformers;
@@ -23,9 +23,16 @@ class BankTransformer extends TransformerAbstract
         return [
             'id'         => (int) $model->id,
             'name'       => $model->name,
-            'logo'       => $model->logo,
+            'logo'       => $this->makeLogoPath($model),
             'created_at' => $model->created_at,
             'updated_at' => $model->updated_at
         ];
+    }
+
+    public function makeLogoPath(Bank $model)
+    {
+        $url = url('/');
+        $folder = Bank::logosDir();
+        return "$url/storage/$folder/{$model->logo}";
     }
 }

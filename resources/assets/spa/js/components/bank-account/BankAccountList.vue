@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <!--<div class="container">-->
 	    <div class="row">
 	        <page-title>
             	<h5>Minhas contas bancárias</h5>
@@ -26,6 +26,19 @@
 		    				<td>{{ o.name }}</td>
 		    				<td>{{ o.agency }}</td>
 		    				<td>{{ o.account }}</td>
+                            <td>
+                               <div class="row valign-wrapper">
+                                  <div class="col s2">
+                                      <img :src="o.bank.data.logo" class="bank-logo"/>
+                                  </div>
+                                  <div class="col s10">
+                                      <span class="left">{{o.bank.data.name}}</span>
+                                  </div>
+                               </div>
+                            </td>
+                            <td>
+                                <i class="material-icons green-text" v-if="o.default">check</i>
+                            </td>
 		    				<td>
 		    					<a v-link="{ name: 'bank-account.update', params: {id: o.id} }">Editar</a> |
 		    					<a href="#" @click.prevent="openModalDelete(o)">Excluir</a>
@@ -44,10 +57,10 @@
 	    	   </a>
 	    	</div>    	
 	    </div>
-    </div>
+    <!--</div>-->
     <modal :modal="modal">
         <div slot="content" v-if="bankAccountToDelete">
-            <h4>Menssagem de confirmação</h4>
+            <h4>Mensagem de confirmação</h4>
             <p><strong>Deseja excluir esta conta bancária?</strong></p>
             <div class="divider"></div>
             <p>Nome: <strong>{{ bankAccountToDelete.name}}</strong></p>
@@ -56,10 +69,10 @@
             <div class="divider"></div>
         </div>
         <div slot="footer">
-        	<button class="btn btn-flat wave-effect green lighten-2 model-close model-action"
+        	<button class="btn btn-flat waves-effect green lighten-2 modal-close modal-action"
         		@click="destroy()">OK
         	</button>
-        	<button class="btn btn-flat wave-effect waves-red modal-close model-action">Cancelar</button>
+        	<button class="btn btn-flat waves-effect waves-red modal-close modal-action">Cancelar</button>
         </div>
     	
     </modal>
@@ -100,20 +113,22 @@
                 table:{
                     headers:{
                         id: {
-                            label: '#',
-                            width: '10%'
+                            label: '#', width: '7%'
                         },
                         name: {
-                            label: 'Nome',
-                            width: '45%'
+                            label: 'Nome', width: '30%'
                         },
                         agency: {
-                            label: 'Agência',
-                            width: '15%'
+                            label: 'Agência', width: '13%'
                         },
                         account: {
-                            label: 'C/C',
-                            width: '15%'
+                            label: 'C/C', width: '13%'
+                        },
+                        'banks:bank_id|banks.name': {
+                            label: 'Banco', width: '17%'
+                        },
+                        'default': {
+                            label: 'Padrão', width: '5%'
                         }
 
                     }
@@ -128,19 +143,24 @@
     			BankAccount.delete({id: this.bankAccountToDelete.id}).then((response)=> {
     				this.bankAccounts.$remove(this.bankAccountToDelete);
     				this.bankAccountToDelete = null;
+                    if(this.bankAccounts.length === 0 && this.pagination.current_page >0){
+                         this.pagination.current_page--;
+                    }
     				Materialize.toast('Conta bancária excluida com sucesso!', 4000);
     			});
     		},
     		openModalDelete(bankAccount){
     			this.bankAccountToDelete = bankAccount;
-    			$('#modal-deletea').modal('open');
+    			$('#modal-delete').modal('open');
     		},
             getBankAccounts(){
                 BankAccount.query({
                     page: this.pagination.current_page + 1,
                     orderBy: this.order.key,
                     sortedBy: this.order.sort,
-                    search: this.search
+                    search: this.search,
+                    include: 'bank',
+
                 }).then((response) => {
                     this.bankAccounts = response.data.data;
                     let pagination = response.data.meta.pagination;
@@ -154,6 +174,7 @@
                 this.getBankAccounts();
             },
             filter(){
+                this.pagination.current_page = 0;
                 this.getBankAccounts();
             }
     	},
